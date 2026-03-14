@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GigShield Admin — AI Insurance Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg:       #060608;
+      --card:     rgba(18, 18, 26, 0.6);
+      --card2:    rgba(26, 26, 46, 0.8);
+      --border:   rgba(255,255,255,0.05);
+      --border-hover: rgba(255,255,255,0.15);
+      --border-accent: rgba(255, 107, 53, 0.3);
+      --orange:   #FF6B35;
+      --orange2:  #FFB347;
+      --green:    #10b981;
+      --red:      #ef4444;
+      --blue:     #3b82f6;
+      --purple:   #8b5cf6;
+      --yellow:   #f59e0b;
+      --text:     #ffffff;
+      --muted:    rgba(255,255,255,0.5);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { 
+      font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; 
+      background-image: radial-gradient(circle at 15% 50%, rgba(255, 107, 53, 0.05), transparent 25%),
+                        radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.05), transparent 25%);
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      position:fixed; left:0; top:0; width:240px; height:100vh;
+      background: rgba(10, 10, 15, 0.85); backdrop-filter: blur(20px); border-right:1px solid var(--border);
+      display:flex; flex-direction:column; padding:24px 0; z-index:100;
+    }
+    .logo { display:flex; align-items:center; gap:12px; padding:0 20px 32px; }
+    .logo-icon {
+      width:44px; height:44px; border-radius:12px;
+      background:linear-gradient(135deg,var(--orange),var(--orange2));
+      display:flex; align-items:center; justify-content:center; font-size:22px;
+      box-shadow:0 4px 20px rgba(255,107,53,0.4);
+    }
+    .logo-text { font-size:18px; font-weight:800; }
+    .logo-sub  { font-size:10px; color:var(--muted); margin-top:2px; }
+    .nav-item  {
+      display:flex; align-items:center; gap:12px; padding:12px 20px;
+      cursor:pointer; border-radius:10px; margin:2px 12px;
+      transition:all .2s; color:var(--muted); font-size:14px; font-weight:500;
+    }
+    .nav-item:hover,.nav-item.active { background:rgba(255,107,53,0.12); color:var(--orange); }
+    .nav-item span { font-size:18px; }
+
+    /* ── Main ── */
+    .main { margin-left:240px; padding:32px; min-height:100vh; }
+    .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:32px; }
+    .header h1 { 
+      font-size:28px; font-weight:800; letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #fff, rgba(255,255,255,0.7)); 
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+    }
+    .header p  { color:var(--muted); font-size:13px; margin-top:4px; }
+    .badge { background:rgba(34,197,94,.15); color:var(--green); border:1px solid var(--green);
+             padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600; }
+    .btn {
+      padding:10px 20px; border-radius:10px; border:none; cursor:pointer;
+      font-family:inherit; font-size:13px; font-weight:600; transition:all .2s;
+    }
+    .btn-orange { background:linear-gradient(135deg,var(--orange),var(--orange2)); color:#fff; }
+    .btn-orange:hover { transform:translateY(-1px); box-shadow:0 4px 20px rgba(255,107,53,.4); }
+    .btn-blue   { background:rgba(59,130,246,.2); color:var(--blue); border:1px solid var(--blue); }
+
+    /* ── Stats Grid ── */
+    .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+    .stat-card {
+      background:var(--card); backdrop-filter: blur(16px); border:1px solid var(--border); border-radius:16px;
+      padding:22px; transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative; overflow: hidden;
+    }
+    .stat-card::before {
+      content: ''; position: absolute; top:0; left:-100%; width:50%; height:100%;
+      background: linear-gradient(to right, transparent, rgba(255,255,255,0.03), transparent);
+      transform: skewX(-20deg); transition: 0.5s;
+    }
+    .stat-card:hover::before { left:150%; }
+    .stat-card:hover { transform:translateY(-4px); border-color:var(--border-accent); box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); }
+    .stat-label { font-size:12px; color:var(--muted); font-weight:500; margin-bottom:12px; }
+    .stat-value { font-size:32px; font-weight:800; margin-bottom:6px; }
+    .stat-sub   { font-size:12px; color:var(--muted); }
+    .stat-icon  { font-size:28px; margin-bottom:10px; }
+
+    /* ── Charts Row ── */
+    .charts-row { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:28px; }
+    .chart-card {
+      background:var(--card); backdrop-filter: blur(16px); border:1px solid var(--border); border-radius:16px; padding:24px;
+      transition: border-color 0.3s;
+    }
+    .chart-card:hover { border-color: var(--border-hover); }
+    .chart-title { font-size:16px; font-weight:700; margin-bottom:20px; color: #fff; }
+
+    /* ── Table ── */
+    .table-card {
+      background:var(--card); backdrop-filter: blur(16px); border:1px solid var(--border); border-radius:16px; padding:24px;
+      margin-bottom:28px; transition: border-color 0.3s;
+    }
+    .table-card:hover { border-color: var(--border-hover); }
+    .table-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+    table { width:100%; border-collapse:collapse; }
+    th { text-align:left; padding:10px 14px; font-size:11px; color:var(--muted); font-weight:600;
+         text-transform:uppercase; letter-spacing:.5px; border-bottom:1px solid var(--border); }
+    td { padding:12px 14px; font-size:13px; border-bottom:1px solid rgba(255,255,255,.03); }
+    tr:hover td { background:rgba(255,255,255,.02); }
+    .badge-status {
+      padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600;
+    }
+    .badge-paid     { background:rgba(34,197,94,.15);  color:var(--green);  border:1px solid var(--green); }
+    .badge-pending  { background:rgba(245,158,11,.15); color:var(--yellow); border:1px solid var(--yellow); }
+    .badge-rejected { background:rgba(239,68,68,.15);  color:var(--red);    border:1px solid var(--red); }
+
+    /* ── Trigger Demo ── */
+    .demo-section {
+      background:linear-gradient(135deg, rgba(255,107,53,0.08), rgba(255,179,71,0.03));
+      border:1px solid var(--border-accent); border-radius:16px; padding:28px; margin-bottom:28px;
+      backdrop-filter: blur(16px); box-shadow: inset 0 0 20px rgba(255,107,53,0.02);
+    }
+    .demo-section h3 { font-size:18px; font-weight:700; margin-bottom:8px; }
+    .demo-section p  { color:var(--muted); font-size:13px; margin-bottom:20px; }
+    .demo-controls { display:flex; gap:12px; flex-wrap:wrap; }
+    .demo-controls select, .demo-controls input {
+      background:var(--card2); border:1px solid var(--border); color:var(--text);
+      padding:10px 14px; border-radius:10px; font-family:inherit; font-size:13px;
+    }
+    .demo-result {
+      margin-top:16px; padding:16px; background:rgba(0,0,0,.3); border-radius:12px;
+      font-size:13px; font-family:monospace; display:none; white-space:pre-wrap;
+    }
+    .demo-result.show { display:block; }
+
+    /* ── Confirmation Box ── */
+    .confirm-box {
+      margin-top: 16px; padding: 20px;
+      background:rgba(245,158,11,.1); border:1px solid var(--yellow);
+      border-radius:12px; display:none;
+    }
+    .confirm-box h4 { color: var(--yellow); margin-bottom: 8px; font-size: 15px; }
+    .confirm-box p { color: #fff; font-size: 13px; margin-bottom: 16px; font-weight: 500;}
+    .confirm-actions { display: flex; gap: 10px; }
+    .btn-red { background: linear-gradient(135deg, var(--red), #dc2626); color: #fff; }
+    .btn-red:hover { box-shadow:0 4px 20px rgba(239,68,68,.4); }
+    .btn-gray { background: rgba(255,255,255,0.1); color: #fff; }
+    .btn-gray:hover { background: rgba(255,255,255,0.2); }
+
+    /* ── Loading ── */
+    .loading { display:inline-block; width:16px; height:16px; border:2px solid rgba(255,255,255,.2);
+               border-top-color:var(--orange); border-radius:50%; animation:spin .6s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .pulse { animation:pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+    /* ── Fraud Alerts ── */
+    .alert-item {
+      display:flex; align-items:center; gap:14px; padding:14px;
+      background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.2);
+      border-radius:12px; margin-bottom:10px;
+    }
+    .alert-icon { font-size:24px; flex-shrink:0; }
+    .alert-text { flex:1; }
+    .alert-text b { color:var(--red); }
+
+    /* Responsive */
+    @media(max-width:1100px) { .stats-grid{ grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:768px)  {
+      .sidebar{ display:none; } .main{ margin-left:0; }
+      .charts-row{ grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">🛡️</div>
+    <div>
+      <div class="logo-text">GigShield</div>
+      <div class="logo-sub">Admin Dashboard</div>
+    </div>
+  </div>
+  <div class="nav-item active" onclick="showSection('overview')"><span>📊</span> Overview</div>
+  <div class="nav-item" onclick="showSection('workers')"><span>👷</span> Workers</div>
+  <div class="nav-item" onclick="showSection('claims')"><span>📋</span> Claims</div>
+  <div class="nav-item" onclick="showSection('approvals')"><span>✅</span> Approvals <span id="nav-approvals-badge" style="background:var(--yellow); color:#000; font-size:10px; padding:2px 6px; border-radius:10px; margin-left:8px; display:none">0</span></div>
+  <div class="nav-item" onclick="showSection('fraud')"><span>🚨</span> Fraud Alerts</div>
+  <div class="nav-item" onclick="showSection('demo')"><span>⚡</span> Demo Trigger</div>
+</aside>
+
+<!-- Main -->
+<main class="main">
+  <div class="header">
+    <div>
+      <h1>Platform Overview <span class="badge">● Live</span></h1>
+      <p id="last-updated">Fetching data...</p>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-blue" onclick="loadAll()">🔄 Refresh</button>
+      <button class="btn btn-orange" onclick="runAutoTrigger()">⚡ Run Trigger</button>
+    </div>
+  </div>
+
+  <div id="overview-section">
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">👷</div>
+      <div class="stat-label">Total Workers</div>
+      <div class="stat-value" id="total-workers" style="color:var(--orange)">—</div>
+      <div class="stat-sub">Registered on platform</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🛡️</div>
+      <div class="stat-label">Active Policies</div>
+      <div class="stat-value" id="active-policies" style="color:var(--green)">—</div>
+      <div class="stat-sub">Currently insured</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📋</div>
+      <div class="stat-label">Claims Today</div>
+      <div class="stat-value" id="claims-today" style="color:var(--blue)">—</div>
+      <div class="stat-sub" id="total-claims-sub">Total: — | Paid: —</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💰</div>
+      <div class="stat-label">Total Payout</div>
+      <div class="stat-value" id="total-payout" style="color:var(--purple)">—</div>
+      <div class="stat-sub" id="fraud-sub" style="color:var(--red)">Fraud: — alerts</div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-title">📈 Claims by Event Type</div>
+      <canvas id="eventChart" height="200"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">🏙️ Disruptions by City</div>
+      <canvas id="cityChart" height="200"></canvas>
+    </div>
+  </div>
+
+    </div>
+  </div>
+
+  <!-- Demo Trigger Section -->
+  <div id="demo-section" style="display:none;">
+    <div class="demo-section">
+    <h3>⚡ Simulate Disruption (Hackathon Demo)</h3>
+    <p>Manually trigger a claim for a worker. This simulates what happens when weather conditions exceed thresholds — auto fraud check + payout simulation.</p>
+    <div class="demo-controls">
+      <input id="demo-userid" placeholder="User ID (from workers table)" style="width:300px">
+      <select id="demo-event">
+        <option value="rain">🌧️ Heavy Rain</option>
+        <option value="pollution">🌫️ High Pollution</option>
+        <option value="heatwave">🌡️ Heatwave</option>
+      </select>
+      <input id="demo-value" type="number" placeholder="Event Value (e.g. 150)" value="150" style="width:180px">
+      <input id="demo-city" placeholder="City" value="Chennai" style="width:140px">
+      <button class="btn btn-orange" onclick="prepareDemoTrigger()">⚡ Trigger Now</button>
+    </div>
+    
+    <div id="demo-confirm" class="confirm-box">
+      <h4>⚠️ Action Required</h4>
+      <p id="demo-confirm-text">Are you sure you want to trigger this disruption?</p>
+      <div class="confirm-actions">
+        <button class="btn btn-red" onclick="executeDemoTrigger()">Yes, Proceed & Payout</button>
+        <button class="btn btn-gray" onclick="cancelDemoTrigger()">Cancel</button>
+      </div>
+    </div>
+    
+    <div class="demo-result" id="demo-result"></div>
+
+    </div>
+  </div>
+
+  <!-- Workers Table -->
+  <div id="workers-section" style="display:none;">
+    <div class="table-card" id="section-workers-table">
+    <div class="table-header">
+      <div class="chart-title" style="margin:0">👷 Registered Workers</div>
+      <div id="workers-count" style="color:var(--muted);font-size:13px">Loading...</div>
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+            <tr>
+              <th>Name & ID</th><th>Phone</th><th>Platform</th><th>City</th>
+              <th>Daily Income</th><th>Risk</th><th>Premium/wk</th><th>Registered</th>
+            </tr>
+        </thead>
+        <tbody id="workers-tbody">
+          <tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px">Loading...</td></tr>
+        </tbody>
+      </table>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Claims Table -->
+  <div id="claims-section" style="display:none;">
+    <div class="table-card">
+    <div class="table-header">
+      <div class="chart-title" style="margin:0">📋 All Claims</div>
+      <div id="claims-count" style="color:var(--muted);font-size:13px">Loading...</div>
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Event</th><th>City</th><th>Worker ID</th><th>Value</th>
+            <th>Payout</th><th>Status</th><th>Fraud</th><th>Time</th>
+          </tr>
+        </thead>
+        <tbody id="claims-tbody">
+          <tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px">Loading...</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Approvals Table Section -->
+  <div id="approvals-section" style="display:none;">
+    <div class="table-card">
+    <div class="table-header">
+      <div class="chart-title" style="margin:0">✅ Pending Approvals</div>
+      <div id="approvals-count" style="color:var(--muted);font-size:13px">Loading...</div>
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Event</th><th>City</th><th>Worker ID</th><th>Condition met</th>
+            <th>Potential Payout</th><th>Status</th><th>Action</th><th>Time</th>
+          </tr>
+        </thead>
+        <tbody id="approvals-tbody">
+          <tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px">Loading...</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fraud Alerts -->
+  <div id="fraud-section" style="display:none;">
+    <div class="table-card">
+    <div class="chart-title">🚨 Fraud Alerts</div>
+    <div id="fraud-list">
+      <div style="color:var(--muted);padding:20px;text-align:center">Loading...</div>
+    </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  function showSection(sectionId) {
+    // Update active nav state
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+
+    // Update section visibility
+    document.getElementById('overview-section').style.display   = (sectionId === 'overview') ? 'block' : 'none';
+    document.getElementById('workers-section').style.display    = (sectionId === 'workers') ? 'block' : 'none';
+    document.getElementById('claims-section').style.display     = (sectionId === 'claims') ? 'block' : 'none';
+    document.getElementById('approvals-section').style.display  = (sectionId === 'approvals') ? 'block' : 'none';
+    document.getElementById('fraud-section').style.display      = (sectionId === 'fraud') ? 'block' : 'none';
+    document.getElementById('demo-section').style.display       = (sectionId === 'demo') ? 'block' : 'none';
+  }
+</script>
+
+<script>
+  const API = 'http://localhost:8000';
+  let eventChart, cityChart;
+
+  async function api(path, method='GET', body=null) {
+    const opts = { method, headers:{'Content-Type':'application/json'} };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(API + path, opts);
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  }
+
+  async function loadStats() {
+    try {
+      const s = await api('/admin/stats');
+      document.getElementById('total-workers').textContent    = s.total_workers;
+      document.getElementById('active-policies').textContent  = s.active_policies;
+      document.getElementById('claims-today').textContent     = s.claims_today;
+      document.getElementById('total-payout').textContent     = '₹' + s.total_payout.toLocaleString('en-IN');
+      document.getElementById('total-claims-sub').textContent = `Total: ${s.total_claims} | Paid: ${s.paid_claims}`;
+      document.getElementById('fraud-sub').textContent        = `Fraud: ${s.fraud_alerts} alerts`;
+      document.getElementById('last-updated').textContent     = 'Last updated: ' + new Date().toLocaleTimeString();
+    } catch(e) { console.warn('Stats error:', e.message); }
+  }
+
+  async function loadWorkers() {
+    try {
+      const data = await api('/admin/workers');
+      document.getElementById('workers-count').textContent = `${data.total} workers`;
+      const tbody = document.getElementById('workers-tbody');
+      if (!data.workers.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px">No workers yet. Register via API or Flutter app.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.workers.map(w => `
+        <tr>
+          <td>
+            <b>${w.name}</b>
+            <div style="font-size:10px; color:var(--purple); margin-top:4px; font-family:monospace; user-select:all; cursor:pointer;" onclick="navigator.clipboard.writeText('${w.user_id}'); alert('Copied ID: ${w.user_id}')" title="Click to copy User ID">${w.user_id}</div>
+          </td>
+          <td>${w.phone}</td>
+          <td>${w.platform}</td>
+          <td>${w.city}</td>
+          <td>₹${w.daily_income?.toLocaleString('en-IN')}</td>
+          <td><span style="color:${riskColor(w.risk_label)};font-weight:700">${w.risk_label||'—'}</span></td>
+          <td>₹${(w.weekly_premium||0).toFixed(0)}</td>
+          <td style="color:var(--muted);font-size:11px">${w.created_at ? new Date(w.created_at).toLocaleDateString() : '—'}</td>
+        </tr>`).join('');
+    } catch(e) { console.warn('Workers error:', e.message); }
+  }
+
+  async function loadClaims() {
+    try {
+      const data = await api('/admin/claims');
+      document.getElementById('claims-count').textContent = `${data.total} claims`;
+      const tbody = document.getElementById('claims-tbody');
+      if (!data.claims.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px">No claims yet. Use Demo Trigger to simulate one.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.claims.map(c => `
+        <tr>
+          <td>${eventIcon(c.event_type)} ${c.event_type?.toUpperCase()}</td>
+          <td>${c.city}</td>
+          <td style="color:var(--muted);font-size:11px">${c.user_id?.slice(0,12)}…</td>
+          <td>${c.event_value?.toFixed(1)}</td>
+          <td style="color:var(--green);font-weight:700">₹${c.payout}</td>
+          <td><span class="badge-status badge-${c.status}">${c.status?.toUpperCase()}</span></td>
+          <td>${c.is_fraud ? '🚨 YES' : '✅ No'}</td>
+          <td style="color:var(--muted);font-size:11px">${c.triggered_at ? new Date(c.triggered_at).toLocaleString() : '—'}</td>
+        </tr>`).join('');
+    } catch(e) { console.warn('Claims error:', e.message); }
+  }
+
+  async function loadApprovals() {
+    try {
+      const data = await api('/admin/claims');
+      const pending = data.claims.filter(c => c.status === 'pending_approval');
+      
+      const badge = document.getElementById('nav-approvals-badge');
+      if (pending.length > 0) {
+        badge.style.display = 'inline-block';
+        badge.textContent = pending.length;
+      } else {
+        badge.style.display = 'none';
+      }
+
+      document.getElementById('approvals-count').textContent = `${pending.length} pending`;
+      const tbody = document.getElementById('approvals-tbody');
+      if (!pending.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px">No claims waiting for approval ✅</td></tr>';
+        return;
+      }
+      tbody.innerHTML = pending.map(c => `
+        <tr>
+          <td>${eventIcon(c.event_type)} ${c.event_type?.toUpperCase()}</td>
+          <td>${c.city}</td>
+          <td style="color:var(--muted);font-size:11px">${c.user_id?.slice(0,12)}…</td>
+          <td>${c.event_value?.toFixed(1)}</td>
+          <td style="color:var(--green);font-weight:700">₹${c.payout}</td>
+          <td><span class="badge-status badge-pending">PENDING</span></td>
+          <td>
+            <button class="btn btn-blue" style="font-size:11px; padding:4px 8px; margin-right:4px;" onclick="approveClaim('${c.claim_id}')">Approve</button>
+            <button class="btn btn-red" style="font-size:11px; padding:4px 8px" onclick="rejectClaim('${c.claim_id}')">Reject</button>
+          </td>
+          <td style="color:var(--muted);font-size:11px">${c.triggered_at ? new Date(c.triggered_at).toLocaleString() : '—'}</td>
+        </tr>`).join('');
+    } catch(e) { console.warn('Approvals error:', e.message); }
+  }
+
+  async function approveClaim(id) {
+    if (!confirm('Approve this claim and issue payout immediately?')) return;
+    try {
+      await api('/claims/approve/' + id, 'POST');
+      loadAll();
+    } catch(e) { alert('Approval failed: ' + e.message); }
+  }
+
+  async function rejectClaim(id) {
+    if (!confirm('Reject this claim? No payout will be issued.')) return;
+    try {
+      await api('/claims/reject/' + id, 'POST');
+      loadAll();
+    } catch(e) { alert('Rejection failed: ' + e.message); }
+  }
+
+  async function loadFraud() {
+    try {
+      const data = await api('/admin/fraud-alerts');
+      const list  = document.getElementById('fraud-list');
+      if (!data.alerts.length) {
+        list.innerHTML = '<div style="color:var(--green);padding:16px">✅ No fraud alerts. All claims are legitimate.</div>';
+        return;
+      }
+      list.innerHTML = data.alerts.map(a => `
+        <div class="alert-item">
+          <div class="alert-icon">🚨</div>
+          <div class="alert-text">
+            <b>Fraud Detected</b> — ${a.event_type?.toUpperCase()} claim in ${a.city}<br>
+            <span style="color:var(--muted);font-size:12px">Worker: ${a.user_id?.slice(0,16)}… | Payout blocked | ${new Date(a.triggered_at).toLocaleString()}</span>
+          </div>
+        </div>`).join('');
+    } catch(e) { console.warn('Fraud error:', e.message); }
+  }
+
+  async function loadAnalytics() {
+    try {
+      const data = await api('/admin/disruption-analytics');
+      const events = {rain:0, pollution:0, heatwave:0};
+      const cities  = {};
+      data.analytics.forEach(a => {
+        events[a.event] = (events[a.event]||0) + a.count;
+        cities[a.city]  = (cities[a.city]||0) + a.count;
+      });
+
+      if (eventChart) eventChart.destroy();
+      eventChart = new Chart(document.getElementById('eventChart'), {
+        type:'doughnut',
+        data:{
+          labels:['🌧️ Rain','🌫️ Pollution','🌡️ Heatwave'],
+          datasets:[{ data:[events.rain,events.pollution,events.heatwave],
+            backgroundColor:['rgba(59,130,246,.8)','rgba(139,92,246,.8)','rgba(239,68,68,.8)'],
+            borderWidth:0, hoverOffset:8 }]
+        },
+        options:{ responsive:true, plugins:{ legend:{ labels:{ color:'#fff', font:{size:12} } } } }
+      });
+
+      if (cityChart) cityChart.destroy();
+      const cityNames = Object.keys(cities);
+      cityChart = new Chart(document.getElementById('cityChart'), {
+        type:'bar',
+        data:{
+          labels: cityNames,
+          datasets:[{ label:'Claims', data:cityNames.map(c=>cities[c]),
+            backgroundColor:'rgba(255,107,53,.7)', borderRadius:6, borderSkipped:false }]
+        },
+        options:{
+          responsive:true,
+          plugins:{ legend:{ display:false } },
+          scales:{
+            x:{ ticks:{ color:'#888' }, grid:{ color:'rgba(255,255,255,.04)' } },
+            y:{ ticks:{ color:'#888' }, grid:{ color:'rgba(255,255,255,.04)' }, beginAtZero:true }
+          }
+        }
+      });
+    } catch(e) { console.warn('Analytics error:', e.message); }
+  }
+
+  async function runAutoTrigger() {
+    try {
+      const res = await api('/claims/run-auto-trigger', 'POST');
+      alert(`✅ ${res.message}\nClaims triggered: ${res.triggered}`);
+      await loadAll();
+    } catch(e) { alert('Error: ' + e.message); }
+  }
+
+  let pendingDemoPayload = null;
+
+  function prepareDemoTrigger() {
+    const userId = document.getElementById('demo-userid').value.trim();
+    const event  = document.getElementById('demo-event').value;
+    const value  = parseFloat(document.getElementById('demo-value').value) || 150;
+    const city   = document.getElementById('demo-city').value.trim() || 'Chennai';
+    if (!userId) { alert('Enter a User ID from the Workers table above'); return; }
+
+    pendingDemoPayload = { user_id:userId, event_type:event, event_value:value, city };
+    
+    document.getElementById('demo-confirm-text').innerHTML = `Are you sure you want to trigger a <b>${event.toUpperCase()}</b> disruption for <b>User ID:</b> <code>${userId}</code>?<br><br>If legitimate, the system will automatically process a payout immediately.`;
+    document.getElementById('demo-confirm').style.display = 'block';
+    
+    const result = document.getElementById('demo-result');
+    result.className = 'demo-result';
+  }
+
+  function cancelDemoTrigger() {
+    pendingDemoPayload = null;
+    document.getElementById('demo-confirm').style.display = 'none';
+  }
+
+  async function executeDemoTrigger() {
+    if (!pendingDemoPayload) return;
+    
+    document.getElementById('demo-confirm').style.display = 'none';
+    const result = document.getElementById('demo-result');
+    result.textContent = 'Triggering AI check & simulated payout...';
+    result.className   = 'demo-result show';
+    
+    try {
+      const res = await api('/claims/trigger-demo', 'POST', pendingDemoPayload);
+      result.textContent = JSON.stringify(res, null, 2);
+      result.style.color = '#22c55e';
+      await loadAll();
+    } catch(e) {
+      result.textContent = '❌ Error: ' + e.message;
+      result.style.color = '#ef4444';
+    }
+    pendingDemoPayload = null;
+  }
+
+  function riskColor(label) {
+    const map = {LOW:'#22c55e', MEDIUM:'#f59e0b', HIGH:'#ef4444', CRITICAL:'#7c3aed'};
+    return map[label] || '#6b7280';
+  }
+  function eventIcon(type) {
+    return {rain:'🌧️', pollution:'🌫️', heatwave:'🌡️'}[type] || '⚡';
+  }
+
+  async function loadAll() {
+    await Promise.allSettled([loadStats(), loadWorkers(), loadClaims(), loadApprovals(), loadFraud(), loadAnalytics()]);
+  }
+
+  // Auto-refresh every 30 seconds
+  loadAll();
+  setInterval(loadAll, 30000);
+</script>
+</body>
+</html>
