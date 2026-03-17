@@ -20,7 +20,7 @@ def check_pollution(city: str):
         print(f"   💰 Payout: ₹{POLLUTION_PAYOUT} per active worker in {city}")
         return True
     else:
-        print(f"   ✅ No trigger. Air quality acceptable.")
+        print(f"    No trigger. Air quality acceptable.")
         return False
 
 
