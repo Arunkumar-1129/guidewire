@@ -101,34 +101,34 @@ StillPaid uses a data-driven verification pipeline.
 
 ✔ Verification
 
-External APIs validate disruption events
+    💠External APIs validate disruption events
 
-Events mapped to geographic zones
+    💠Events mapped to geographic zones
 
-Workers filtered based on location & time
+    💠Workers filtered based on location & time
 
 ✔ Fraud Control
 
-One payout per trigger
+    💠One payout per trigger
 
-Location consistency checks
+    💠Location consistency checks
 
-Time-window validation
+    💠Time-window validation
 
 👉 Fully automated, transparent, and fraud-resistant.
 
 🧠 AI Integration
 1️⃣ Risk Prediction
 
-Estimates disruption probability
+    💠Estimates disruption probability
 
-Determines dynamic premiums
+    💠Determines dynamic premiums
 
 2️⃣ Fraud Detection
 
-Detects abnormal claim behavior
+    💠Detects abnormal claim behavior
 
-Prevents duplicate claims
+    💠Prevents duplicate claims
 
 🚀 Unique Features (USP)
 🔹 Adaptive Parametric Payout
@@ -144,21 +144,23 @@ Predicts high-risk events and alerts workers in advance.
 Groups workers by location to stabilize payouts and improve sustainability.
 
 📊 Analytics Dashboard
+
+
 👤 Worker View
 
-Active coverage
+        💠Active coverage
 
-Disruption alerts
+        💠Disruption alerts
 
-Claim history
+        💠Claim history
 
 🏢 Admin View
 
-Risk insights
+        💠Risk insights
 
-Claim analytics
+        💠Claim analytics
 
-Fraud alerts
+        💠Fraud alerts
 
 🛠️ Development Roadmap
 Phase 1 — Ideation
@@ -201,17 +203,19 @@ StillPaid/
 ├── database/
 ├── docs/
 └── README.md
+
+
 🎥 Demo Video
 
 👉 [Add your Phase-1 video link here]
 
-👥 Team
+👥 Team Crashers
 
-Member 1
+Dhinesh B
 
-Member 2
+Arun Kumar P
 
-Member 3
+Sabareeshwaran B
 
 🏁 Final Note
 
