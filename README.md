@@ -196,13 +196,19 @@ Phase 3 — Advanced Features
     Dynamic policy customization
 
 📁 Repository Structure
-StillPaid/
+
+
+```bash
+ai-gig-insurance/
 │
-├── frontend/
+├── admin_dashboard/
+├── ai_models/
 ├── backend/
-├── database/
-├── docs/
-└── README.md
+├── mobile_app/
+├── triggers/
+│
+├── .env.example
+├── README.md
 
 
 🎥 Demo Video
@@ -219,5 +225,4 @@ Sabareeshwaran B
 
 🏁 Final Note
 
-StillPaid is not just insurance —
-it is a next-generation income protection system for gig workers.
+StillPaid is not just insurance — it is a next-generation income protection system for gig workers.
