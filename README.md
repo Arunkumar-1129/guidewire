@@ -165,35 +165,35 @@ Groups workers by location to stabilize payouts and improve sustainability.
 🛠️ Development Roadmap
 Phase 1 — Ideation
 
-Problem analysis
-
-System design
-
-AI planning
+    Problem analysis
+    
+    System design
+    
+    AI planning
 
 Phase 2 — Core System
 
-Worker onboarding
-
-Policy management
-
-Automated claims
+    Worker onboarding
+    
+    Policy management
+    
+    Automated claims
 
 Phase 3 — Advanced Features
 
-Fraud detection
-
-Payout simulation
-
-Analytics dashboard
+    Fraud detection
+    
+    Payout simulation
+    
+    Analytics dashboard
 
 🔮 Future Scope
 
-Platform integration (Swiggy/Zomato)
-
-Hyper-local risk modeling
-
-Dynamic policy customization
+    Platform integration (Swiggy/Zomato)
+    
+    Hyper-local risk modeling
+    
+    Dynamic policy customization
 
 📁 Repository Structure
 StillPaid/
