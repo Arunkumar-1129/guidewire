@@ -1,4 +1,4 @@
-# 🚀 StillPaid  
+# 🛡️ StillPaid  
 ### AI-Powered Parametric Insurance for Gig Workers  
 
 > **“Ensuring gig workers are still paid, even when they cannot work.”**
