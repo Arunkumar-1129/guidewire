@@ -236,17 +236,17 @@ This ensures fairness while preventing system abuse.
 ```text
 stillpaid-insurance/
 │
-├── src/                    # Main application code
-│   ├── admin/              # Admin Dashboard components & views
-│   ├── auth/               # Login & authentication views
-│   ├── services/           # External API integrations (Weather, AQI)
-│   ├── worker/             # Worker Portal (Registration, Claims)
-│   ├── App.jsx             # Main React Router configuration
-│   └── store.js            # Simulated LocalStorage backend
+├── src/                    
+│   ├── admin/              
+│   ├── auth/               
+│   ├── services/           
+│   ├── worker/             
+│   ├── App.jsx             
+│   └── store.js            
 │
-├── .env                    # Environment variables (API keys)
-├── package.json            # Project dependencies
-└── README.md               # Project documentation
+├── .env                    
+├── package.json            
+└── README.md               
 ```
 🎥 Demo Video phase 1
 
