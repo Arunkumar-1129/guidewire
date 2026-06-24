@@ -16,6 +16,56 @@ const NAV_ITEMS = [
   { path: '/profile', label: 'Profile', icon: User },
 ];
 
+function BottomNav({ location, navigate }) {
+  return (
+    <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-50">
+      {/* Frosted glass nav bar */}
+      <div
+        className="glass-dark border-t border-border-line px-4 py-2 pb-safe"
+        style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
+      >
+        <div className="flex justify-around">
+          {NAV_ITEMS.map(({ path, label, icon: Icon }) => {
+            const active =
+              location.pathname === path ||
+              (path === '/claims' && location.pathname === '/claims');
+            return (
+              <button
+                key={path}
+                id={`nav-${label.toLowerCase()}`}
+                onClick={() => navigate(path)}
+                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all duration-250 cursor-pointer relative group ${
+                  active ? 'text-indigo-400' : 'text-text-muted hover:text-text-sub'
+                }`}
+              >
+                {/* Active pill background */}
+                {active && (
+                  <div className="absolute inset-0 rounded-xl bg-indigo-500/10 border border-indigo-500/20" />
+                )}
+
+                {/* Icon with glow when active */}
+                <div className={`relative z-10 ${active ? 'text-indigo-400' : ''}`}>
+                  {active && (
+                    <div className="absolute -inset-1 rounded-full bg-indigo-500/15 blur-sm" />
+                  )}
+                  <Icon
+                    size={20}
+                    strokeWidth={active ? 2.5 : 1.5}
+                    className="relative z-10"
+                  />
+                </div>
+                <span className="text-[10px] font-semibold relative z-10 tracking-wide">
+                  {label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function WorkerApp() {
   const [worker, setWorker] = useState(getCurrentWorker());
   const navigate = useNavigate();
@@ -38,7 +88,7 @@ export default function WorkerApp() {
   return (
     <div className="min-h-screen bg-bg-base flex flex-col max-w-md mx-auto relative">
       {/* Routes */}
-      <div className={`flex-1 ${!isOnboarding ? 'pb-20' : ''}`}>
+      <div className={`flex-1 ${!isOnboarding ? 'pb-24' : ''}`}>
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/onboarding" element={<WhatsappOnboarding onComplete={refreshWorker} />} />
@@ -52,29 +102,7 @@ export default function WorkerApp() {
 
       {/* Bottom Navigation */}
       {!isOnboarding && worker && (
-        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-50">
-          <div className="glass-dark border-t border-border-line px-2 py-2">
-            <div className="flex justify-around">
-              {NAV_ITEMS.map(({ path, label, icon: Icon }) => {
-                const active = location.pathname === path || (path === '/claims' && location.pathname === '/claims');
-                return (
-                  <button
-                    key={path}
-                    onClick={() => navigate(path)}
-                    className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${
-                      active
-                        ? 'text-indigo-400 bg-indigo-500/10'
-                        : 'text-text-muted hover:text-gray-300'
-                    }`}
-                  >
-                    <Icon size={20} strokeWidth={active ? 2.5 : 1.5} />
-                    <span className="text-[11px] font-medium">{label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
+        <BottomNav location={location} navigate={navigate} />
       )}
     </div>
   );
